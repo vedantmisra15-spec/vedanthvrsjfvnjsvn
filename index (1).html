@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>HeritageAI — Cultural Heritage Preservation System</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+
+  <!-- ===== TOAST ===== -->
+  <div id="toast" class="toast" aria-live="polite"></div>
+
+  <!-- ===== LOGIN PAGE ===== -->
+  <div id="loginPage" class="page active">
+    <div class="login-bg">
+      <div class="login-pattern"></div>
+    </div>
+    <div class="login-card">
+      <div class="login-brand">
+        <div class="brand-icon">⛩</div>
+        <h1>HeritageAI</h1>
+        <p>Cultural Heritage Preservation System</p>
+      </div>
+      <div class="login-form">
+        <div class="form-group">
+          <label for="email">Email Address</label>
+          <input type="email" id="email" placeholder="curator@heritage.org" autocomplete="off"/>
+          <span class="field-icon">✉</span>
+        </div>
+        <div class="form-group">
+          <label for="password">Password</label>
+          <input type="password" id="password" placeholder="••••••••" />
+          <span class="field-icon">🔒</span>
+        </div>
+        <p class="login-hint">Demo: any email + password (min 6 chars)</p>
+        <button id="loginBtn" class="btn-primary" onclick="handleLogin()">Sign In</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== APP SHELL (Dashboard + Profile) ===== -->
+  <div id="appShell" class="page">
+
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-brand">
+        <div class="brand-icon-sm">⛩</div>
+        <span>HeritageAI</span>
+      </div>
+
+      <nav class="sidebar-nav">
+        <a href="#" class="nav-item active" data-page="dashboardPage" onclick="navigate(event,'dashboardPage')">
+          <span class="nav-icon">◈</span>
+          <span>Dashboard</span>
+        </a>
+        <a href="#" class="nav-item" data-page="profilePage" onclick="navigate(event,'profilePage')">
+          <span class="nav-icon">◉</span>
+          <span>Profile</span>
+        </a>
+        <a href="#" class="nav-item" data-page="sitesPage" onclick="navigate(event,'sitesPage')">
+          <span class="nav-icon">◎</span>
+          <span>Heritage Sites</span>
+        </a>
+        <a href="#" class="nav-item" data-page="reportsPage" onclick="navigate(event,'reportsPage')">
+          <span class="nav-icon">◇</span>
+          <span>Reports</span>
+        </a>
+      </nav>
+
+      <div class="sidebar-footer">
+        <div class="sidebar-user" id="sidebarUser"></div>
+        <button class="btn-logout" onclick="handleLogout()">↩ Logout</button>
+      </div>
+    </aside>
+
+    <!-- Mobile top bar -->
+    <header class="topbar">
+      <button class="hamburger" onclick="toggleSidebar()">☰</button>
+      <span class="topbar-title">HeritageAI</span>
+      <button class="btn-logout-sm" onclick="handleLogout()">↩</button>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-content">
+
+      <!-- ===== DASHBOARD PAGE ===== -->
+      <section id="dashboardPage" class="inner-page active">
+        <div class="page-header">
+          <div>
+            <h2>Preservation Dashboard</h2>
+            <p class="page-subtitle">Real-time monitoring of cultural heritage sites</p>
+          </div>
+          <div class="header-date" id="headerDate"></div>
+        </div>
+
+        <!-- Summary Cards -->
+        <div class="cards-grid">
+          <div class="card stat-card">
+            <div class="stat-icon visitors">👁</div>
+            <div class="stat-body">
+              <span class="stat-label">Total Visitors Today</span>
+              <span class="stat-value" data-count="3842">0</span>
+              <span class="stat-change up">↑ 12.4% vs yesterday</span>
+            </div>
+          </div>
+          <div class="card stat-card">
+            <div class="stat-icon condition">🏛</div>
+            <div class="stat-body">
+              <span class="stat-label">Avg. Site Condition</span>
+              <span class="stat-value">87<small>%</small></span>
+              <span class="stat-change up">↑ Stable</span>
+            </div>
+          </div>
+          <div class="card stat-card">
+            <div class="stat-icon risk">⚠</div>
+            <div class="stat-body">
+              <span class="stat-label">Overall Risk Level</span>
+              <span class="stat-value risk-moderate">Moderate</span>
+              <span class="stat-change neutral">● 2 sites flagged</span>
+            </div>
+          </div>
+          <div class="card stat-card">
+            <div class="stat-icon artifacts">🏺</div>
+            <div class="stat-body">
+              <span class="stat-label">Artifacts Catalogued</span>
+              <span class="stat-value" data-count="12480">0</span>
+              <span class="stat-change up">↑ 38 new this week</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Charts Row -->
+        <div class="two-col">
+          <!-- Crowd Prediction Chart -->
+          <div class="card chart-card">
+            <div class="card-header">
+              <h3>Crowd Prediction — Next 7 Days</h3>
+              <span class="badge badge-blue">AI Forecast</span>
+            </div>
+            <canvas id="crowdChart" height="220"></canvas>
+          </div>
+
+          <!-- Condition Trend -->
+          <div class="card chart-card">
+            <div class="card-header">
+              <h3>Site Condition Trend</h3>
+              <span class="badge badge-green">Monthly</span>
+            </div>
+            <canvas id="conditionChart" height="220"></canvas>
+          </div>
+        </div>
+
+        <!-- Monitoring + Authenticity Row -->
+        <div class="two-col">
+          <!-- Monitoring Section -->
+          <div class="card">
+            <div class="card-header">
+              <h3>Site Monitoring Status</h3>
+              <span class="badge badge-amber">Live</span>
+            </div>
+            <div class="monitor-list">
+              <div class="monitor-item">
+                <div class="monitor-info">
+                  <span class="status-dot good"></span>
+                  <div>
+                    <strong>Amber Fort, Jaipur</strong>
+                    <small>Structural integrity: 94%</small>
+                  </div>
+                </div>
+                <span class="monitor-badge good">Good</span>
+              </div>
+              <div class="monitor-item">
+                <div class="monitor-info">
+                  <span class="status-dot moderate"></span>
+                  <div>
+                    <strong>Qutb Minar, Delhi</strong>
+                    <small>Structural integrity: 78%</small>
+                  </div>
+                </div>
+                <span class="monitor-badge moderate">Moderate</span>
+              </div>
+              <div class="monitor-item">
+                <div class="monitor-info">
+                  <span class="status-dot good"></span>
+                  <div>
+                    <strong>Hampi Ruins, Karnataka</strong>
+                    <small>Structural integrity: 91%</small>
+                  </div>
+                </div>
+                <span class="monitor-badge good">Good</span>
+              </div>
+              <div class="monitor-item">
+                <div class="monitor-info">
+                  <span class="status-dot critical"></span>
+                  <div>
+                    <strong>Ajanta Caves, Maharashtra</strong>
+                    <small>Structural integrity: 62%</small>
+                  </div>
+                </div>
+                <span class="monitor-badge critical">Critical</span>
+              </div>
+              <div class="monitor-item">
+                <div class="monitor-info">
+                  <span class="status-dot moderate"></span>
+                  <div>
+                    <strong>Konark Temple, Odisha</strong>
+                    <small>Structural integrity: 74%</small>
+                  </div>
+                </div>
+                <span class="monitor-badge moderate">Moderate</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Authenticity Scores -->
+          <div class="card">
+            <div class="card-header">
+              <h3>Authenticity Scores</h3>
+              <span class="badge badge-purple">AI Verified</span>
+            </div>
+            <div class="auth-list">
+              <div class="auth-item">
+                <div class="auth-header">
+                  <span>Amber Fort</span><span>96%</span>
+                </div>
+                <div class="progress-bar"><div class="progress-fill" style="width:96%; background: var(--green)"></div></div>
+              </div>
+              <div class="auth-item">
+                <div class="auth-header">
+                  <span>Qutb Minar</span><span>81%</span>
+                </div>
+                <div class="progress-bar"><div class="progress-fill" style="width:81%; background: var(--amber)"></div></div>
+              </div>
+              <div class="auth-item">
+                <div class="auth-header">
+                  <span>Hampi Ruins</span><span>88%</span>
+                </div>
+                <div class="progress-bar"><div class="progress-fill" style="width:88%; background: var(--green)"></div></div>
+              </div>
+              <div class="auth-item">
+                <div class="auth-header">
+                  <span>Ajanta Caves</span><span>59%</span>
+                </div>
+                <div class="progress-bar"><div class="progress-fill" style="width:59%; background: var(--red)"></div></div>
+              </div>
+              <div class="auth-item">
+                <div class="auth-header">
+                  <span>Konark Temple</span><span>73%</span>
+                </div>
+                <div class="progress-bar"><div class="progress-fill" style="width:73%; background: var(--amber)"></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Restoration Preview -->
+        <div class="card restoration-card">
+          <div class="card-header">
+            <h3>AI Restoration Preview — Ajanta Caves</h3>
+            <span class="badge badge-red">Priority Restore</span>
+          </div>
+          <div class="restoration-grid">
+            <div class="restoration-panel">
+              <div class="resto-img before-img">
+                <div class="resto-overlay">BEFORE</div>
+                <div class="resto-placeholder">
+                  <span>🏚</span>
+                  <p>Current Degraded State</p>
+                  <small>Captured: March 2026</small>
+                </div>
+              </div>
+            </div>
+            <div class="restoration-arrow">→</div>
+            <div class="restoration-panel">
+              <div class="resto-img after-img">
+                <div class="resto-overlay">AFTER (AI Model)</div>
+                <div class="resto-placeholder">
+                  <span>🏛</span>
+                  <p>AI Restoration Simulation</p>
+                  <small>Projected: Dec 2026</small>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="restoration-meta">
+            <span>🔬 AI Confidence: <strong>89%</strong></span>
+            <span>⏱ Estimated Duration: <strong>8 months</strong></span>
+            <span>💰 Est. Cost: <strong>₹4.2 Cr</strong></span>
+            <button class="btn-secondary">View Full Report</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- ===== PROFILE PAGE ===== -->
+      <section id="profilePage" class="inner-page">
+        <div class="page-header">
+          <div>
+            <h2>My Profile</h2>
+            <p class="page-subtitle">Account information and preferences</p>
+          </div>
+        </div>
+
+        <div class="profile-layout">
+          <div class="card profile-card">
+            <div class="profile-avatar-wrap">
+              <div class="profile-avatar">
+                <span id="avatarInitials">RC</span>
+              </div>
+              <div class="avatar-badge">✓</div>
+            </div>
+            <h3 id="profileName">Dr. Riya Chatterjee</h3>
+            <p id="profileRole">Senior Heritage Curator</p>
+            <div class="profile-tags">
+              <span class="tag">UNESCO Certified</span>
+              <span class="tag">AI Specialist</span>
+            </div>
+            <button class="btn-primary" onclick="showEditToast()">✏ Edit Profile</button>
+          </div>
+
+          <div class="card profile-details">
+            <h3 class="details-title">Account Details</h3>
+            <div class="detail-row">
+              <span class="detail-label">Full Name</span>
+              <span class="detail-value" id="detailName">Dr. Riya Chatterjee</span>
+            </div>
+            <div class="detail-row">
+              <span class="detail-label">Email</span>
+              <span class="detail-value" id="detailEmail">riya@heritageai.org</span>
+            </div>
+            <div class="detail-row">
+              <span class="detail-label">Department</span>
+              <span class="detail-value">Conservation & Restoration</span>
+            </div>
+            <div class="detail-row">
+              <span class="detail-label">Location</span>
+              <span class="detail-value">New Delhi, India</span>
+            </div>
+            <div class="detail-row">
+              <span class="detail-label">Member Since</span>
+              <span class="detail-value">January 2022</span>
+            </div>
+            <div class="detail-row">
+              <span class="detail-label">Sites Managed</span>
+              <span class="detail-value">12 Active Sites</span>
+            </div>
+            <div class="detail-row">
+              <span class="detail-label">Role</span>
+              <span class="detail-value"><span class="badge badge-purple">Admin</span></span>
+            </div>
+          </div>
+        </div>
+
+        <div class="card profile-stats-card">
+          <h3 class="details-title">Activity Overview</h3>
+          <div class="profile-stats">
+            <div class="pstat">
+              <span class="pstat-val">47</span>
+              <span class="pstat-label">Reports Filed</span>
+            </div>
+            <div class="pstat">
+              <span class="pstat-val">12</span>
+              <span class="pstat-label">Sites Supervised</span>
+            </div>
+            <div class="pstat">
+              <span class="pstat-val">3</span>
+              <span class="pstat-label">Restorations Led</span>
+            </div>
+            <div class="pstat">
+              <span class="pstat-val">98%</span>
+              <span class="pstat-label">Accuracy Score</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ===== HERITAGE SITES PAGE ===== -->
+      <section id="sitesPage" class="inner-page">
+        <div class="page-header">
+          <div>
+            <h2>Heritage Sites</h2>
+            <p class="page-subtitle">All monitored UNESCO and national heritage locations</p>
+          </div>
+          <button class="btn-secondary">+ Add Site</button>
+        </div>
+        <div class="sites-grid">
+          <div class="card site-card">
+            <div class="site-img" style="background: linear-gradient(135deg,#c8894a,#a0522d)"><span>🏰</span></div>
+            <div class="site-body">
+              <div class="site-top"><h4>Amber Fort</h4><span class="monitor-badge good">Good</span></div>
+              <p>Jaipur, Rajasthan</p>
+              <div class="site-meta"><span>👁 2,340 visitors</span><span>⭐ 96% auth.</span></div>
+              <div class="progress-bar mt-sm"><div class="progress-fill" style="width:94%;background:var(--green)"></div></div>
+            </div>
+          </div>
+          <div class="card site-card">
+            <div class="site-img" style="background: linear-gradient(135deg,#8b6914,#6b4f0f)"><span>🕌</span></div>
+            <div class="site-body">
+              <div class="site-top"><h4>Qutb Minar</h4><span class="monitor-badge moderate">Moderate</span></div>
+              <p>Mehrauli, Delhi</p>
+              <div class="site-meta"><span>👁 1,890 visitors</span><span>⭐ 81% auth.</span></div>
+              <div class="progress-bar mt-sm"><div class="progress-fill" style="width:78%;background:var(--amber)"></div></div>
+            </div>
+          </div>
+          <div class="card site-card">
+            <div class="site-img" style="background: linear-gradient(135deg,#5a7a3a,#3d5c26)"><span>🗿</span></div>
+            <div class="site-body">
+              <div class="site-top"><h4>Hampi Ruins</h4><span class="monitor-badge good">Good</span></div>
+              <p>Vijayanagara, Karnataka</p>
+              <div class="site-meta"><span>👁 980 visitors</span><span>⭐ 88% auth.</span></div>
+              <div class="progress-bar mt-sm"><div class="progress-fill" style="width:91%;background:var(--green)"></div></div>
+            </div>
+          </div>
+          <div class="card site-card">
+            <div class="site-img" style="background: linear-gradient(135deg,#7a4a2a,#5c3018)"><span>🖼</span></div>
+            <div class="site-body">
+              <div class="site-top"><h4>Ajanta Caves</h4><span class="monitor-badge critical">Critical</span></div>
+              <p>Aurangabad, Maharashtra</p>
+              <div class="site-meta"><span>👁 620 visitors</span><span>⭐ 59% auth.</span></div>
+              <div class="progress-bar mt-sm"><div class="progress-fill" style="width:62%;background:var(--red)"></div></div>
+            </div>
+          </div>
+          <div class="card site-card">
+            <div class="site-img" style="background: linear-gradient(135deg,#4a6080,#2d4560)"><span>🛕</span></div>
+            <div class="site-body">
+              <div class="site-top"><h4>Konark Temple</h4><span class="monitor-badge moderate">Moderate</span></div>
+              <p>Konark, Odisha</p>
+              <div class="site-meta"><span>👁 1,120 visitors</span><span>⭐ 73% auth.</span></div>
+              <div class="progress-bar mt-sm"><div class="progress-fill" style="width:74%;background:var(--amber)"></div></div>
+            </div>
+          </div>
+          <div class="card site-card">
+            <div class="site-img" style="background: linear-gradient(135deg,#9a6a4a,#7a4a2a)"><span>🏯</span></div>
+            <div class="site-body">
+              <div class="site-top"><h4>Ellora Caves</h4><span class="monitor-badge good">Good</span></div>
+              <p>Aurangabad, Maharashtra</p>
+              <div class="site-meta"><span>👁 1,450 visitors</span><span>⭐ 92% auth.</span></div>
+              <div class="progress-bar mt-sm"><div class="progress-fill" style="width:92%;background:var(--green)"></div></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ===== REPORTS PAGE ===== -->
+      <section id="reportsPage" class="inner-page">
+        <div class="page-header">
+          <div>
+            <h2>Reports</h2>
+            <p class="page-subtitle">AI-generated preservation and risk reports</p>
+          </div>
+          <button class="btn-primary">+ Generate Report</button>
+        </div>
+        <div class="card">
+          <table class="reports-table">
+            <thead>
+              <tr>
+                <th>Report ID</th>
+                <th>Site</th>
+                <th>Type</th>
+                <th>Date</th>
+                <th>Status</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><span class="report-id">#RPT-0091</span></td>
+                <td>Ajanta Caves</td>
+                <td>Risk Assessment</td>
+                <td>10 Apr 2026</td>
+                <td><span class="monitor-badge critical">Critical</span></td>
+                <td><button class="btn-table">View</button></td>
+              </tr>
+              <tr>
+                <td><span class="report-id">#RPT-0090</span></td>
+                <td>Qutb Minar</td>
+                <td>Condition Survey</td>
+                <td>8 Apr 2026</td>
+                <td><span class="monitor-badge moderate">Moderate</span></td>
+                <td><button class="btn-table">View</button></td>
+              </tr>
+              <tr>
+                <td><span class="report-id">#RPT-0089</span></td>
+                <td>Amber Fort</td>
+                <td>Visitor Impact</td>
+                <td>5 Apr 2026</td>
+                <td><span class="monitor-badge good">Good</span></td>
+                <td><button class="btn-table">View</button></td>
+              </tr>
+              <tr>
+                <td><span class="report-id">#RPT-0088</span></td>
+                <td>Konark Temple</td>
+                <td>Restoration Plan</td>
+                <td>1 Apr 2026</td>
+                <td><span class="monitor-badge moderate">Moderate</span></td>
+                <td><button class="btn-table">View</button></td>
+              </tr>
+              <tr>
+                <td><span class="report-id">#RPT-0087</span></td>
+                <td>Hampi Ruins</td>
+                <td>Authenticity Audit</td>
+                <td>28 Mar 2026</td>
+                <td><span class="monitor-badge good">Good</span></td>
+                <td><button class="btn-table">View</button></td>
+              </tr>
+              <tr>
+                <td><span class="report-id">#RPT-0086</span></td>
+                <td>Ellora Caves</td>
+                <td>Environmental Impact</td>
+                <td>25 Mar 2026</td>
+                <td><span class="monitor-badge good">Good</span></td>
+                <td><button class="btn-table">View</button></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
