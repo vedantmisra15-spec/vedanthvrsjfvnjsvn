@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - HeritageGuard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Crimson+Pro:wght@300;400;600;700&family=Libre+Baskerville:wght@400;700&family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body class="dashboard-page">
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="logo">
+                <span class="logo-icon">⚡</span>
+                <span class="logo-text">HeritageGuard</span>
+            </div>
+            <ul class="nav-links">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="dashboard.html" class="active">Dashboard</a></li>
+                <li><a href="index.html#about">About</a></li>
+                <li><a href="index.html#features">Features</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="dashboard-header">
+        <div class="container">
+            <div class="dashboard-title">
+                <h1>Heritage Analytics Dashboard</h1>
+                <p>Real-time monitoring and AI-powered insights</p>
+            </div>
+            <div class="dashboard-status">
+                <div class="status-badge status-online">
+                    <span class="status-dot"></span>
+                    System Online
+                </div>
+                <div class="last-updated" id="lastUpdated">Loading...</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="dashboard-content">
+        <div class="container">
+            
+            <div class="overview-grid">
+                <div class="metric-card card-primary">
+                    <div class="metric-icon">👥</div>
+                    <div class="metric-content">
+                        <div class="metric-label">Current Crowd Level</div>
+                        <div class="metric-value" id="crowdLevel">
+                            <span class="loading-dots">Loading</span>
+                        </div>
+                        <div class="metric-change" id="crowdTrend"></div>
+                    </div>
+                </div>
+
+                <div class="metric-card card-success">
+                    <div class="metric-icon">🏛️</div>
+                    <div class="metric-content">
+                        <div class="metric-label">Sites Monitored</div>
+                        <div class="metric-value" id="sitesMonitored">
+                            <span class="loading-dots">Loading</span>
+                        </div>
+                        <div class="metric-change" id="sitesStatus"></div>
+                    </div>
+                </div>
+
+                <div class="metric-card card-warning">
+                    <div class="metric-icon">⚠️</div>
+                    <div class="metric-content">
+                        <div class="metric-label">Environmental Risk</div>
+                        <div class="metric-value" id="envRisk">
+                            <span class="loading-dots">Loading</span>
+                        </div>
+                        <div class="metric-change" id="envStatus"></div>
+                    </div>
+                </div>
+
+                <div class="metric-card card-info">
+                    <div class="metric-icon">✓</div>
+                    <div class="metric-content">
+                        <div class="metric-label">Authenticity Score</div>
+                        <div class="metric-value" id="authenticityScore">
+                            <span class="loading-dots">Loading</span>
+                        </div>
+                        <div class="metric-change">System average</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="ai-modules-section">
+                <h2 class="section-title">AI Processing Modules</h2>
+                
+                <div class="modules-grid">
+                    
+                    <div class="module-card">
+                        <div class="module-header">
+                            <div class="module-icon">📊</div>
+                            <div>
+                                <h3>Crowd Prediction</h3>
+                                <p>ML-based visitor forecasting</p>
+                            </div>
+                        </div>
+                        
+                        <div class="module-form">
+                            <div class="form-group">
+                                <label>Heritage Site</label>
+                                <select id="siteSelect" class="form-control">
+                                    <option value="1">Taj Mahal - Agra, India</option>
+                                    <option value="2">Colosseum - Rome, Italy</option>
+                                    <option value="3">Machu Picchu - Peru</option>
+                                    <option value="4">Great Wall - China</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Prediction Date</label>
+                                <input type="date" id="predictionDate" class="form-control" />
+                            </div>
+                            <button class="btn btn-primary btn-full" onclick="predictCrowd()">
+                                <span class="btn-text">Predict Crowd Level</span>
+                                <span class="btn-loader" style="display: none;">Processing...</span>
+                            </button>
+                        </div>
+
+                        <div class="module-result" id="crowdResult" style="display: none;">
+                            <div class="result-header">
+                                <h4>Prediction Results</h4>
+                                <button class="btn-close" onclick="closeResult('crowdResult')">✕</button>
+                            </div>
+                            <div class="result-content" id="crowdResultContent"></div>
+                        </div>
+                    </div>
+
+                    <div class="module-card">
+                        <div class="module-header">
+                            <div class="module-icon">🖼️</div>
+                            <div>
+                                <h3>Image Restoration</h3>
+                                <p>AI-powered artifact recovery</p>
+                            </div>
+                        </div>
+                        
+                        <div class="module-form">
+                            <div class="form-group">
+                                <label>Artifact Image</label>
+                                <input type="text" id="imageName" class="form-control" placeholder="artifact_001.jpg" value="heritage_photo_1947.jpg" />
+                            </div>
+                            <div class="form-group">
+                                <label>Damage Type</label>
+                                <select id="damageType" class="form-control">
+                                    <option value="scratches">Scratches</option>
+                                    <option value="fading">Fading</option>
+                                    <option value="cracks">Cracks</option>
+                                    <option value="water_damage">Water Damage</option>
+                                    <option value="missing_parts">Missing Parts</option>
+                                </select>
+                            </div>
+                            <button class="btn btn-primary btn-full" onclick="restoreImage()">
+                                <span class="btn-text">Restore Image</span>
+                                <span class="btn-loader" style="display: none;">Processing...</span>
+                            </button>
+                        </div>
+
+                        <div class="module-result" id="restoreResult" style="display: none;">
+                            <div class="result-header">
+                                <h4>Restoration Results</h4>
+                                <button class="btn-close" onclick="closeResult('restoreResult')">✕</button>
+                            </div>
+                            <div class="result-content" id="restoreResultContent"></div>
+                        </div>
+                    </div>
+
+                    <div class="module-card">
+                        <div class="module-header">
+                            <div class="module-icon">🔍</div>
+                            <div>
+                                <h3>Authenticity Detection</h3>
+                                <p>NLP-based content verification</p>
+                            </div>
+                        </div>
+                        
+                        <div class="module-form">
+                            <div class="form-group">
+                                <label>Content Category</label>
+                                <select id="contentCategory" class="form-control">
+                                    <option value="product">Tourism Product</option>
+                                    <option value="description">Site Description</option>
+                                    <option value="article">Article/Blog</option>
+                                    <option value="marketing">Marketing Material</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Content Text</label>
+                                <textarea id="contentText" class="form-control" rows="4" placeholder="Enter cultural content to analyze...">Experience the authentic traditional crafts of ancient artisans, passed down through generations. Our guided tours showcase genuine cultural heritage and local customs.</textarea>
+                            </div>
+                            <button class="btn btn-primary btn-full" onclick="checkAuthenticity()">
+                                <span class="btn-text">Analyze Authenticity</span>
+                                <span class="btn-loader" style="display: none;">Processing...</span>
+                            </button>
+                        </div>
+
+                        <div class="module-result" id="authenticityResult" style="display: none;">
+                            <div class="result-header">
+                                <h4>Authenticity Analysis</h4>
+                                <button class="btn-close" onclick="closeResult('authenticityResult')">✕</button>
+                            </div>
+                            <div class="result-content" id="authenticityResultContent"></div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            <div class="charts-section">
+                <h2 class="section-title">Performance Analytics</h2>
+                
+                <div class="charts-grid">
+                    <div class="chart-card">
+                        <div class="chart-header">
+                            <h3>Weekly Visitor Trends</h3>
+                            <span class="chart-badge">Last 7 Days</span>
+                        </div>
+                        <div class="chart-container">
+                            <canvas id="visitorsChart"></canvas>
+                        </div>
+                    </div>
+
+                    <div class="chart-card">
+                        <div class="chart-header">
+                            <h3>AI Module Performance</h3>
+                            <span class="chart-badge">Accuracy Metrics</span>
+                        </div>
+                        <div class="chart-container">
+                            <div class="performance-bars">
+                                <div class="perf-bar-item">
+                                    <div class="perf-label">Crowd Prediction</div>
+                                    <div class="perf-bar-container">
+                                        <div class="perf-bar" style="width: 92%;">92%</div>
+                                    </div>
+                                </div>
+                                <div class="perf-bar-item">
+                                    <div class="perf-label">Image Restoration</div>
+                                    <div class="perf-bar-container">
+                                        <div class="perf-bar" style="width: 94%;">94%</div>
+                                    </div>
+                                </div>
+                                <div class="perf-bar-item">
+                                    <div class="perf-label">Authenticity Detection</div>
+                                    <div class="perf-bar-container">
+                                        <div class="perf-bar" style="width: 89%;">89%</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="alerts-section">
+                <h2 class="section-title">System Alerts</h2>
+                <div class="alerts-container" id="alertsContainer">
+                    <div class="alert-placeholder">Loading alerts...</div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-brand">
+                    <div class="logo">
+                        <span class="logo-icon">⚡</span>
+                        <span class="logo-text">HeritageGuard</span>
+                    </div>
+                    <p>AI-powered cultural heritage preservation.</p>
+                </div>
+                <div class="footer-links">
+                    <div class="footer-column">
+                        <h4>Platform</h4>
+                        <a href="dashboard.html">Dashboard</a>
+                        <a href="index.html#features">Features</a>
+                        <a href="index.html#about">About</a>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2024 HeritageGuard. Academic Project.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <script src="dashboard.js"></script>
+</body>
+</html>
